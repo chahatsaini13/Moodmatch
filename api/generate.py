@@ -15,7 +15,7 @@ from groq import Groq
 # ─────────────────────────────────────────────
 #  PATHS  (ROOT = repo root, one level above api/)
 # ─────────────────────────────────────────────
-ROOT          = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT          = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH     = os.path.join(ROOT, "data",   "emotion_design_dataset.json")
 TEMPLATE_PATH = os.path.join(ROOT, "assets", "template_bg.png")
 FONTS_DIR     = "/tmp/fonts"          # only writable dir on Vercel
