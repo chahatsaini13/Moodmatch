@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mood Match</title>
+  <link rel="stylesheet" href="Main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Poppins:wght@300;500;600;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="overlay-container">
+      <div class="header-bar">
+        <h1 class="title">Mood Match</h1>
+        <a href="Home.html" class="back-button">
+          <img src="Images/back.svg" alt="Back to Home" />
+        </a>
+      </div>
+      <div class="generator-box">
+        <h2 class="subtitle">Generate Your Emotion-Inspired Moodboard</h2>
+        <p class="description">
+          Describe your emotion or idea to get a moodboard tailored by AI, with visuals, fonts, and color harmony built to match.
+        </p>
+        <textarea id="prompt-input" class="input-box" placeholder="Enter your feelings or ideas here......"></textarea>
+        <button class="generate-btn" id="generate-btn" onclick="handleGenerate()">Generate</button>
+        <p id="status-msg"></p>
+        <div class="spinner" id="spinner"></div>
+      </div>
+      <div id="result-section">
+        <div id="emotion-text" class="emotion-text"></div>
+        <img id="moodboard-img" src="" alt="Generated Moodboard" />
+        <a id="download-btn" download="moodboard.png">⬇ Download Moodboard</a>
+      </div>
+      <footer class="footer">
+        <hr class="separator" />
+        <div class="footer-text">
+          <p class="team-member">Chahat Saini (2023UCM2312)</p>
+          <p class="team-member">Navneet Sah (2023UCM2304)</p>
+          <p class="team-member">Yashika (2023UCM2381)</p>
+        </div>
+      </footer>
+    </div>
+  </div>
+   <script>
+    async function handleGenerate() {
+      const input     = document.getElementById('prompt-input');
+      const statusMsg = document.getElementById('status-msg');
+      const spinner   = document.getElementById('spinner');
+      const btn       = document.getElementById('generate-btn');
+      const resultSec = document.getElementById('result-section');
+      const img       = document.getElementById('moodboard-img');
+      const dlBtn     = document.getElementById('download-btn');
+      const prompt    = input.value.trim();
+      if (!prompt) { statusMsg.className=''; statusMsg.textContent='Please enter a mood or idea first.'; return; }
+      statusMsg.className='info'; statusMsg.textContent='Generating your moodboard… this takes ~30–60 sec';
+      spinner.classList.add('active'); btn.disabled=true; resultSec.classList.remove('visible');
+      try {
+        const res  = await fetch('/api/generate', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt}) });
+        const data = await res.json();
+        if (!res.ok || data.error) throw new Error(data.error || 'Server error');
+        const src = `data:image/png;base64,${data.image_b64}`;
+        img.src=src; dlBtn.href=src;
+        resultSec.classList.add('visible');
+        statusMsg.className='info'; statusMsg.textContent='✓ Moodboard ready!';
+      } catch(err) {
+        statusMsg.className=''; statusMsg.textContent=`Error: ${err.message}`;
+      } finally {
+        spinner.classList.remove('active'); btn.disabled=false;
+      }
+    }
+    document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey)&&e.key==='Enter') handleGenerate(); });
+  </script>
+</body>
+</html>

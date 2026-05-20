@@ -1,0 +1,251 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #DA9E9E;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: absolute; /* allows scrolling with body */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('Images/bg.svg');
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: cover;
+  filter: brightness(40%) blur(0.5px);
+  z-index: -1;
+}
+
+.page-wrapper {
+  padding: 60px 50px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.overlay-container {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+  padding: 50px;
+  color: white;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-family: 'Gilda Display', serif;
+  font-size: 40px;
+  margin: 0;
+}
+
+.subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.description {
+  color: #cccccc;
+  margin-bottom: 20px;
+  max-width: 600px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.input-box {
+  width: 100%;
+  height: 150px;
+  border: 1.5px solid #6D6C6C;
+  background-color: #00000035;
+  color: white;
+  padding: 15px;
+  font-size: 14px;
+  border-radius: 8px;
+  resize: none;
+  margin-bottom: 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.generate-btn {
+  background-color: rgba(245, 142, 125, 0.7);
+  color: #B1EEFF;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.generate-btn:active {
+  background-color: rgba(177, 238, 255, 0.7);
+  color: #000000;
+}
+
+.generate-btn:hover {
+  filter: brightness(0.95);
+}
+
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.back-button img {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.back-button img:hover {
+  transform: scale(1.1);
+}
+
+.footer {
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 50px;
+  color: white;
+  margin-top: 60px;
+}
+
+.separator {
+  border: none;
+  height: 2px;
+  background-color: white;
+  width: 90%;
+  margin: 40px auto;
+}
+
+.footer-text {
+  margin-top:4 px;
+  margin-bottom: 50px;
+  margin-right: 0px;
+  margin-left: 0px;
+  color: #eeeeee;
+}
+.footer-text p{
+    margin: 3px;
+}
+
+.team {
+  margin-top: 10px;
+}
+
+.team-member {
+  margin: 3px 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 50px;
+}
+
+#result-section {
+  margin-top: 40px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+ 
+#result-section.visible {
+  display: flex;
+}
+
+.emotion-text {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+    color: #333;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: 0.3s ease;
+}
+
+.emotion-text.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#moodboard-img {
+  width: 280px;
+  height: auto;
+  max-height: 70vh;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.5s ease;
+}
+ 
+#download-btn {
+  background: rgba(177, 238, 255, 0.15);
+  color: #B1EEFF;
+  border: 1.5px solid #B1EEFF;
+  padding: 10px 28px;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+ 
+#download-btn:hover {
+  background: rgba(177, 238, 255, 0.3);
+}
+ 
+#status-msg {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: #ffaaaa;
+  margin-top: 8px;
+  min-height: 20px;
+}
+ 
+#status-msg.info {
+  color: #aad4ff;
+}
+ 
+
+.spinner {
+  display: none;
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #F58E7D;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 12px auto 0;
+}
+ 
+.spinner.active {
+  display: block;
+}
+ 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+ 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

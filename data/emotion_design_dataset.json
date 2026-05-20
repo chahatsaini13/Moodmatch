@@ -1,0 +1,290 @@
+{
+  "JOY/HAPPINESS": {
+    "fonts": {
+      "headings": "Fredoka (Bold, fun - Headings, Logo)",
+      "body_text": "Quicksand (Clean, readable - Body Text , Subtext)",
+      "highlight_text": "Pacifico (Playful handwritten - Highlight Text, Callouts)"
+    },
+    "font_color":"#000000",
+    "font_bg_color": "#FFFBA6",
+    "colors": [
+      "#FF6B6B",
+      "#FFA552",
+      "#FDE74C",
+      "#A1E3D8",
+      "#4D9DE0"
+    ],
+    "images_keywords": [
+      "bright flowers",
+      "round patterns",
+      "pretty smiles",
+      "colorful balloons"
+    ],
+    "pattern": "colourful abstract sweet texture",
+    "moodboard": "Joy/Joy.png"
+  },
+  "SORROW/DUSK": {
+    "fonts": {
+      "headings": "Cormorant Garamond (Elegant, classical - Headings, Logo)",
+      "body_text": "Source Sans Pro (Neutral, legible - Body Text , Subtext)",
+      "highlight_text": "Dancing Script (Subtle expressiveness - Highlight Text, Callouts)"
+    },
+    "font_color":"#FFFFFF",
+    "font_bg_color": "#4F4F4F",
+    "colors": [
+      "#A2B8D8",
+      "#C1A3C5",
+      "#7A7A7A",
+      "#CDE7F0",
+      "#3D3D3D"
+    ],
+    "images_keywords": [
+      "crying face",
+      "rainy window",
+      "wilted flower",
+      "lonely bench"
+    ],
+    "pattern": "smooth white smoke",
+    "moodboard": "Sorrow/Sorrow.png"
+  },
+  "LOVE/BLUSH": {
+    "fonts": {
+      "headings": "Playfair Display (Elegant, romantic - Headings, Logo)",
+      "body_text": "Crimson Text (Warm, legible - Body Text , Subtext)",
+      "highlight_text": "Parisienne (Romantic handwritten - Highlight Text, Callouts)"
+    },
+    "font_color":"#FFFFFF",
+    "font_bg_color": "#95434D",
+    "colors": [
+      "#F7C6C7",
+      "#FF6F91",
+      "#B93160",
+      "#FFF1F1",
+      "#472D30"
+    ],
+    "images_keywords": [
+      "mulberry silk fabric flowy",
+      "red roses",
+      "holding hands",
+      "love letters"
+    ],
+    "pattern": "heart pattern",
+    "moodboard": "Love/Love.png"
+  },
+  "POWER/ANGER": {
+    "fonts": {
+      "headings": "Bebas Neue (Bold, Condensed - Headings, Logo)",
+      "body_text": "Roboto (Clean, Geometric - Body Text , Subtext)",
+      "highlight_text": "Black Ops One (Military, heavy-weight - Highlight Text, Callouts)"
+    },
+    "font_color":"#FFFFFF",
+    "font_bg_color": "#1A0D0D",
+    "colors": [
+      "#D72638",
+      "#FF5700",
+      "#FFD700",
+      "#1E1E1E",
+      "#8B0000"
+    ],
+    "images_keywords": [
+      "Buring flower",
+      "strong stance lion",
+      "lightning bolt",
+      "phoenix"
+    ],
+    "pattern": "shattered glass lighting pattern",
+    "moodboard": "Power/Power.png"
+  },
+  "PEACE/SERENITY": {
+    "fonts": {
+      "headings": "Cormorant Garamond (classic, graceful - Headings, Logo)",
+      "body_text": "Lato Light (legible, minimal - Body Text , Subtext)",
+      "highlight_text": "Allura (Whispers of emotion- Highlight Text, Callouts)"
+    },
+    "font_color":"#000000",
+    "font_bg_color": "#EADAF1",
+    "colors": [
+      "#A8D5BA",
+      "#E3F2FD",
+      "#FFF7E6",
+      "#D0CDE1",
+      "#9CAFAA"
+    ],
+    "images_keywords": [
+      "calm lake",
+      "meditation pose",
+      "sunset horizon",
+      "white dove"
+    ],
+    "pattern": "floral pastel texture",
+    "moodboard": "Peace/Peace/png"
+  },
+  "SURPRISE/WONDER": {
+    "fonts": {
+      "headings": "Raleway (Modern, impactful - Headings, Logo)",
+      "body_text": "Nunito ( Friendly, balanced - Body Text , Subtext)",
+      "highlight_text": "Pacifico (Handwritten, quirky, expressive - Highlight Text, Callouts)"
+    },
+    "font_color":"#000000",
+    "font_bg_color": "#FFD7E4",
+    "colors": [
+      "#FFD972",
+      "#FF90B3",
+      "#B388EB",
+      "#5AD1E3",
+      "#FCF6F5"
+    ],
+    "images_keywords": [
+      "wide eyes",
+      "burst of color",
+      "jack-in-the-box",
+      "unexpected gift"
+    ],
+    "pattern": "star tunnel overlay pattern",
+    "moodboard": "Surprise/Surprise.png"
+  },
+  "NEUTRAL/CLARITY": {
+    "fonts": {
+      "headings": "Merriweather (reliable, timeless - Headings, Logo)",
+      "body_text": "Open Sans ( Highly readable, neutral - Body Text , Subtext)",
+      "highlight_text": "Cabin (Rounded, professional - Highlight Text, Callouts)"
+    },
+    "font_color":"#000000",
+    "font_bg_color": "#E8E1CA",
+    "colors": [
+      "#C2B280",
+      "#8D8D8D",
+      "#F4F2ED",
+      "#6B4C3B",
+      "#E0D8CC"
+    ],
+    "images_keywords": [
+      "monotone background",
+      "blank expression",
+      "gray wall",
+      "minimalist room"
+    ],
+    "pattern": "minimalist background",
+    "moodboard": "Neutral/Neutral.png"
+  },
+  "TRUST/SECURITY": {
+    "fonts": {
+      "headings": "Merriweather (reliable, timeless - Headings, Logo)",
+      "body_text": "Inter (Modern and highly legible - Body Text , Subtext)",
+      "highlight_text": "DM Sans ( Clean, readable - Highlight Text, Callouts)"
+    },
+    "font_color":"#000000",
+    "font_bg_color": "#D5DCE4",
+    "colors": [
+      "#1A73E8",
+      "#4CAF50",
+      "#B0BEC5",
+      "#F5F5F5",
+      "#0D1B2A"
+    ],
+    "images_keywords": [
+      "handshake",
+      "open arms",
+      "guide dog",
+      "team huddle"
+    ],
+    "pattern": "geometric textures",
+    "moodboard": "Trust/Trust.png"
+  },
+  "FEAR/ANXIETY": {
+    "fonts": {
+      "headings": "Cinzel Decorative (Gothic, intense - Headings, Logo)",
+      "body_text": "DM Sans (Clear, simple - Body Text , Subtext)",
+      "highlight_text": "UnifrakturCook ( Distorted, glitchy - Highlight Text, Callouts)"
+    },
+    "font_color":"#FFFFFF",
+    "font_bg_color": "#28232C",
+    "colors": [
+      "#1A1A1A",
+      "#4B4F55",
+      "#B9C9D9",
+      "#6E5A7C",
+      "#7C2F36"
+    ],
+    "images_keywords": [
+      "dark alley",
+      "ominous shadow",
+      "eerie lighting",
+      "creepy forest"
+    ],
+    "pattern": "distorted glitch pattern",
+    "moodboard": "Fear/Fear.png"
+  },
+  "DISGUST/NAUSEA": {
+    "fonts": {
+      "headings": "Staatliches (Sharp, striking - Headings, Logo)",
+      "body_text": "DM Sans (Simple, slightly uneasy - Body Text, Subtext)",
+      "highlight_text": "Special Elite (Grungy typewriter - Highlight Text, Callouts)"
+    },
+    "font_color":"#FFFFFF",
+    "font_bg_color": "#67694E",
+    "colors": [
+      "#556B2F",   
+      "#6E260E",   
+      "#A9A9A9",   
+      "#D4FF4B",   
+      "#8B0000"    
+    ],
+    "images_keywords": [
+      "rotting fruit or moldy food",
+      "insect swarms",
+      "green slime",
+      "poisonous mushroom"
+    ],
+    "pattern": "unpleasant textures",
+    "moodboard": "Disgust/Disgust.png"
+  },
+  "GUILT/SHAME": {
+    "fonts": {
+      "headings": "Raleway (Delicate, tense - Headings, Logo)",
+      "body_text": "Roboto (Neutral, reserved - Body Text, Subtext)",
+      "highlight_text": "Amatic SC (Nervous, quirky - Highlight Text, Callouts)"
+    },
+    "font_color":"#FFFFFF",
+    "font_bg_color": "#C41941",
+    "colors": [
+      "#FFC1CC",   
+      "#C44D58",   
+      "#F7E4D4",   
+      "#A9A9A9",   
+      "#6B4226"    
+    ],
+    "images_keywords": [
+      "covered / hiding eyes",
+      "porcelain cracked face",
+      "shadow standing alone and sad",
+      "blood stained hands"
+    ],
+    "pattern": "shattered glass pattern",
+    "moodboard": "Guilt/Guilt.png"
+  },
+  "HOPE/GLOW": {
+    "fonts": {
+      "headings": "Playfair Display (Classic, Graceful - Headings, Logo)",
+      "body_text": "Nunito (Soft, Friendly - Body Text, Subtext)",
+      "highlight_text": "Quicksand (Modern, Airy - Highlight Text, Callouts)"
+    },
+    "font_color":"#000000",
+    "font_bg_color": "#F5F1E7",
+    "colors": [
+      "#FCE7DB",   
+      "#FDF3C6",   
+      "#EADBC8",   
+      "#D9C8E2",   
+      "#FAFAF7"    
+    ],
+    "images_keywords": [
+      "glowing sunlight through clouds",
+      "open windows with sheer curtains",
+      "upward reach toward sky",
+      "indoor plants in soft light"
+    ],
+    "pattern": "flowy pastels textures",
+    "moodboard": "Hope/Hope.png"
+  }
+}
