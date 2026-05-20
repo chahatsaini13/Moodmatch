@@ -17,7 +17,7 @@ from groq import Groq
 # ─────────────────────────────────────────────
 ROOT          = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH     = os.path.join(ROOT, "data",   "emotion_design_dataset.json")
-TEMPLATE_PATH = os.path.join(ROOT, "assets", "template_bg.png")
+TEMPLATE_PATH = os.path.join(ROOT, "assets", "Blank Template.png")
 FONTS_DIR     = "/tmp/fonts"          # only writable dir on Vercel
 
 # ─────────────────────────────────────────────
