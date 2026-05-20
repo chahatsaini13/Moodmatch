@@ -1,28 +1,20 @@
-"""
-api/generate.py  —  Vercel Python Serverless Function
-Handles POST /api/generate → returns { image_b64, emotion }
-"""
-
 import os, re, json, time, base64
 import concurrent.futures
 from io import BytesIO
 from http.server import BaseHTTPRequestHandler
-
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from groq import Groq
 
-# ─────────────────────────────────────────────
-#  PATHS  (ROOT = repo root, one level above api/)
-# ─────────────────────────────────────────────
+
+#  PATHS 
 ROOT          = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH     = os.path.join(ROOT, "data",   "emotion_design_dataset.json")
 TEMPLATE_PATH = os.path.join(ROOT, "assets", "Blank Template.png")
 FONTS_DIR     = "/tmp/fonts"          # only writable dir on Vercel
 
-# ─────────────────────────────────────────────
-#  API KEYS  (set in Vercel Dashboard → Settings → Environment Variables)
-# ─────────────────────────────────────────────
+
+#  API KEYS  
 GROQ_API_KEY         = os.environ.get("GROQ_API_KEY")
 HF_TOKEN             = os.environ.get("HF_TOKEN")
 PEXELS_API_KEY       = os.environ.get("PEXELS_API_KEY")
@@ -30,9 +22,8 @@ GOOGLE_FONTS_API_KEY = os.environ.get("GOOGLE_FONTS_API_KEY")
 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-# ─────────────────────────────────────────────
-#  ASSETS  (loaded once per cold start, reused across warm invocations)
-# ─────────────────────────────────────────────
+
+#  ASSETS  
 def _sanitize_label(label: str) -> str:
     return re.sub(r'[\s\-_\/]+', '/', label.strip().upper())
 
@@ -42,24 +33,26 @@ with open(DATA_PATH) as _f:
 emotion_dataset: dict = {_sanitize_label(k): v for k, v in _raw.items()}
 template_bg: Image.Image = Image.open(TEMPLATE_PATH).convert("RGB")
 
-# ─────────────────────────────────────────────
-#  EMOTION CLASSIFICATION  (HuggingFace Inference API)
-# ─────────────────────────────────────────────
+
+#  EMOTION CLASSIFICATION 
 def predict_emotion(text: str) -> str:
+    import httpx
     url     = "https://api-inference.huggingface.co/models/chahatsaini1309/moodmatch-emotion-model"
     headers = {"Authorization": f"Bearer {HF_TOKEN}"}
     for _ in range(3):
-        resp   = requests.post(url, headers=headers, json={"inputs": text}, timeout=20)
-        result = resp.json()
-        if isinstance(result, list):
-            label = max(result[0], key=lambda x: x["score"])["label"]
-            return _sanitize_label(label)
+        try:
+            resp   = httpx.post(url, headers=headers, json={"inputs": text}, timeout=25)
+            result = resp.json()
+            if isinstance(result, list):
+                label = max(result[0], key=lambda x: x["score"])["label"]
+                return _sanitize_label(label)
+        except Exception:
+            pass
         time.sleep(2)
-    raise RuntimeError(f"HuggingFace model unavailable: {result}")
+    raise RuntimeError("HuggingFace model unavailable after 3 retries")
 
-# ─────────────────────────────────────────────
+
 #  DESIGN EXTRACTION
-# ─────────────────────────────────────────────
 def extract_design(emotion: str):
     design  = emotion_dataset[emotion]
     colors  = design["colors"]
@@ -67,9 +60,8 @@ def extract_design(emotion: str):
     fonts   = design.get("fonts", {})
     return palette, fonts.get("title", "Playfair Display"), fonts.get("body", "Lato")
 
-# ─────────────────────────────────────────────
-#  FONT DOWNLOAD  (cached to /tmp/fonts)
-# ─────────────────────────────────────────────
+
+#  FONT DOWNLOAD 
 _FONT_URL_OVERRIDES = {
     "Poppins":    "https://fonts.gstatic.com/s/poppins/v20/pxiGyp8kv8JHgFVrJJfedw.woff2",
     "Open Sans":  "https://fonts.gstatic.com/s/opensans/v18/mem8YaGs126MiZpBA-UFVZ0bf8pkAg.woff2",
@@ -119,9 +111,8 @@ def load_fonts(emotion: str) -> dict:
             paths[role] = _download_font(raw_name, font_url)
     return paths
 
-# ─────────────────────────────────────────────
+
 #  CANVAS HELPERS
-# ─────────────────────────────────────────────
 def create_canvas() -> Image.Image:
     return template_bg.copy()
 
@@ -204,9 +195,8 @@ def render_typography(canvas: Image.Image, emotion: str) -> Image.Image:
 
     return canvas
 
-# ─────────────────────────────────────────────
-#  IMAGE SEARCH & FETCH  (parallel)
-# ─────────────────────────────────────────────
+
+#  IMAGE SEARCH & FETCH 
 def build_image_queries(prompt: str, emotion: str) -> list[str]:
     palette, title_font, body_font = extract_design(emotion)
     context = f"""
@@ -280,9 +270,8 @@ def render_images(canvas: Image.Image, images: list) -> Image.Image:
         canvas.paste(fit_image(img, (x2 - x1, y2 - y1)), (x1, y1))
     return canvas
 
-# ─────────────────────────────────────────────
+
 #  MAIN PIPELINE
-# ─────────────────────────────────────────────
 def create_moodboard(prompt: str, emotion: str) -> Image.Image:
     palette, _, _ = extract_design(emotion)
     canvas        = create_canvas()
@@ -293,9 +282,8 @@ def create_moodboard(prompt: str, emotion: str) -> Image.Image:
     canvas        = render_images(canvas, images)
     return canvas
 
-# ─────────────────────────────────────────────
+
 #  VERCEL HTTP HANDLER
-# ─────────────────────────────────────────────
 class handler(BaseHTTPRequestHandler):
 
     # ── silence the default access-log noise in Vercel logs ──
