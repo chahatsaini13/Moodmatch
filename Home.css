@@ -596,18 +596,19 @@ body::before {
 
 .vibe-box {
   background: #0D0D1F50;
-  padding: 30px 40px;
+  padding: 24px 30px;
   border-radius: 20px;
   width: 320px;
-  height: 70px;
+  min-height: 70px;
+  height: auto;
   text-align: center;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
   font-family: 'Poppins', sans-serif;
   transition: all 0.3s ease;
+  position: relative;        /* needed for absolute span to work */
 }
 
 .vibe-box h3 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 20px;
   font-weight: 700;
 }
@@ -634,7 +635,7 @@ body::before {
   border: 3px solid #ffcc00;
   box-shadow: 0 0 20px #ffcc00;
   transform: translateX(300px);
-} 
+}
 
 .vibe-box span {
   position: absolute;
@@ -642,13 +643,15 @@ body::before {
   left: 50%;
   transform: translate(-50%, -50%);
   opacity: 0;
-  max-width: 80%;
-  line-height: 1.4;
-  font-size: 14px;
+  width: calc(100% - 40px);  /* respects padding on both sides */
+  line-height: 1.6;
+  font-size: 13px;
   color: #ddd;
   transition: opacity 0.4s ease;
-  text-align: center;
-  font-weight: 50px;
+  text-align: justify;
+  text-align-last: center;   /* last line stays centered */
+  font-weight: 400;          /* was incorrectly set to 50px */
+  pointer-events: none;
 }
 
 .vibe-box:hover span {
