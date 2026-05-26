@@ -71,14 +71,11 @@ def predict_emotion(text: str) -> str:
         "x-wait-for-model": "true",
         "Content-Type":     "application/json",
     }
-
-    # warm-up ping — wakes the model before the real call
     try:
         with httpx.Client(timeout=60.0) as client:
             client.post(url, headers=headers, json={"inputs": "warmup"})
     except Exception:
         pass
-
     backoff_schedule = [5, 15, 30, 45]
 
     for attempt, wait in enumerate(backoff_schedule):
@@ -97,33 +94,31 @@ def predict_emotion(text: str) -> str:
             if attempt < len(backoff_schedule) - 1:
                 time.sleep(wait)
             continue
-    return _keyword_fallback(text)
+    return _groq_fallback(text)
 
 
-def _keyword_fallback(text: str) -> str:
-    text = text.lower()
-    if any(w in text for w in ["happy", "joy", "excited", "fun", "vibrant", "playful", "cheerful"]):
-        return "JOY/HAPPINESS"
-    if any(w in text for w in ["love", "romantic", "affection", "blush", "tender"]):
-        return "LOVE/BLUSH"
-    if any(w in text for w in ["sad", "depressed", "cry", "grief", "lonely", "heartbreak", "sorrow"]):
-        return "SORROW/DUSK"
-    if any(w in text for w in ["angry", "rage", "furious", "hate", "annoyed", "power", "bold", "strong"]):
-        return "POWER/ANGER"
-    if any(w in text for w in ["fear", "scared", "anxious", "nervous", "worry", "dread"]):
-        return "FEAR/ANXIETY"
-    if any(w in text for w in ["peace", "calm", "serene", "relax", "gentle", "soft"]):
-        return "PEACE/SERENITY"
-    if any(w in text for w in ["trust", "safe", "secure", "stable", "comfort"]):
-        return "TRUST/SECURITY"
-    if any(w in text for w in ["hope", "glow", "warm", "optimistic", "bright"]):
-        return "HOPE/GLOW"
-    if any(w in text for w in ["surprise", "wonder", "amazed", "curious", "wow"]):
-        return "SURPRISE/WONDER"
-    if any(w in text for w in ["guilt", "shame", "regret", "embarrassed"]):
-        return "GUILT/SHAME"
-    if any(w in text for w in ["disgust", "nausea", "gross", "repulsed"]):
-        return "DISGUST/NAUSEA"
+def _groq_fallback(text: str) -> str:
+    try:
+        resp = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an emotion classifier. Given any word or phrase, return ONLY one of these exact labels — nothing else:\n"
+                        "JOY/HAPPINESS, LOVE/BLUSH, SORROW/DUSK, POWER/ANGER, FEAR/ANXIETY, "
+                        "PEACE/SERENITY, TRUST/SECURITY, HOPE/GLOW, SURPRISE/WONDER, "
+                        "GUILT/SHAME, DISGUST/NAUSEA, NEUTRAL/CLARITY"
+                    )
+                },
+                {"role": "user", "content": text}
+            ],
+        )
+        label = resp.choices[0].message.content.strip().upper()
+        if label in emotion_dataset:
+            return label
+    except Exception:
+        pass
     return "NEUTRAL/CLARITY"
 
 
