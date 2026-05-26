@@ -8,16 +8,6 @@
       "maxDuration": 15
     }
   },
-  "builds": [
-    { "src": "api/generate.py", "use": "@vercel/python" },
-    { "src": "api/warmup.py", "use": "@vercel/python" },
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "*.css", "use": "@vercel/static" },
-    { "src": "*.js", "use": "@vercel/static" },
-    { "src": "Images/**", "use": "@vercel/static" },
-    { "src": "data/**", "use": "@vercel/static" },
-    { "src": "assets/**", "use": "@vercel/static" }
-  ],
   "routes": [
     { "src": "/api/generate", "dest": "/api/generate.py" },
     { "src": "/api/warmup", "dest": "/api/warmup.py" },
