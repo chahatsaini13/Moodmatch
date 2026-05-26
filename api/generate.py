@@ -274,37 +274,42 @@ def render_typography(canvas: Image.Image, emotion: str) -> Image.Image:
 def build_image_queries(prompt: str, emotion: str) -> list[str]:
     palette, title_font, body_font = extract_design(emotion)
     context = f"""
-Prompt: {prompt}
-Emotion: {emotion}
-Mandatory color palette: {palette}
+You are a visual search expert. Generate 6 Pexels photography search queries for a moodboard.
 
-Generate 6 HIGH-QUALITY photography search queries optimized for Pexels.
+User's idea: {prompt}
+Emotional tone: {emotion}
+Color palette to match: {palette}
 
-STRICT RULES:
-- Each query MUST reference the given colors in subject, background, lighting, clothing, or atmosphere.
-- Use aesthetic, descriptive, visual keywords (e.g. soft lighting, cinematic, dreamy, minimal, warm tones, pastel, moody).
-- Keep queries SHORT (6–12 words max).
-- Use natural photography language.
-- DO NOT include platform names like Pinterest, Instagram.
-- Focus on real-world photography (people, objects, nature, lifestyle).
-- Add style words: "natural light", "professional photo", "4k", "cinematic lighting".
+RULES:
+- Each query must visually reflect the emotional tone: {emotion}
+- Each query must incorporate the colors from the palette: {palette} — through lighting, objects, clothing, backgrounds, or atmosphere
+- The brightness, energy, and mood of every query must match the emotion — bright and airy for positive emotions, dark and muted for negative ones
+- Use concrete, visual, real-world subjects: people, nature, objects, spaces, textures
+- Add photography style words: natural light, cinematic, soft focus, golden hour, high contrast, shallow depth of field
+- Keep each query between 5 and 10 words
+- Do NOT use abstract or conceptual words like "emotion", "feeling", "mood", "concept"
+- Do NOT repeat the same subject across queries — vary the scenes
 
-Examples:
-- love → romantic couple soft pink lighting rose petals warm glow
-- anger → intense lion dark background red lighting dramatic shadows
-- peace → minimal room white curtains soft sunlight pastel tones calm
-
-Return ONLY valid JSON with key "queries" containing an array of 6 strings.
+Return ONLY valid JSON with key "queries" containing exactly 6 strings.
 """
     resp = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         response_format={"type": "json_object"},
         messages=[
-            {"role": "system", "content": "Generate 6 Pexels photography search queries. Return JSON with key 'queries'."},
-            {"role": "user",   "content": context},
+            {
+                "role": "system",
+                "content": (
+                    "You are a visual search expert who creates photography search queries for moodboards. "
+                    "Queries must visually and emotionally match the given tone and color palette. "
+                    "The lighting, energy, and subject matter must reflect the emotion accurately. "
+                    "Return JSON with key 'queries' containing exactly 6 strings."
+                )
+            },
+            {"role": "user", "content": context},
         ],
     )
     return json.loads(resp.choices[0].message.content)["queries"]
+    
 
 def _fetch_one(query: str) -> Image.Image | None:
     try:
