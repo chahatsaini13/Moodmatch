@@ -11,7 +11,7 @@ from groq import Groq
 ROOT          = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH     = os.path.join(ROOT, "data",   "emotion_design_dataset.json")
 TEMPLATE_PATH = os.path.join(ROOT, "assets", "Blank Template.png")
-FONTS_DIR     = "/tmp/fonts"          # only writable dir on Vercel
+FONTS_DIR     = "/tmp/fonts"
 
 
 #  API KEYS  
@@ -34,22 +34,58 @@ emotion_dataset: dict = {_sanitize_label(k): v for k, v in _raw.items()}
 template_bg: Image.Image = Image.open(TEMPLATE_PATH).convert("RGB")
 
 
-#  EMOTION CLASSIFICATION 
+#  EMOTION CLASSIFICATION
 def predict_emotion(text: str) -> str:
     import httpx
     url     = "https://api-inference.huggingface.co/models/chahatsaini1309/moodmatch-emotion-model"
-    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
-    for _ in range(3):
+    headers = {
+        "Authorization":    f"Bearer {HF_TOKEN}",
+        "x-wait-for-model": "true",
+        "Content-Type":     "application/json",
+    }
+
+    # warm-up ping — wakes the model before the real call
+    try:
+        with httpx.Client(timeout=60.0) as client:
+            client.post(url, headers=headers, json={"inputs": "warmup"})
+    except Exception:
+        pass
+
+    backoff_schedule = [5, 15, 30, 45]
+
+    for attempt, wait in enumerate(backoff_schedule):
         try:
-            resp   = httpx.post(url, headers=headers, json={"inputs": text}, timeout=25)
-            result = resp.json()
-            if isinstance(result, list):
-                label = max(result[0], key=lambda x: x["score"])["label"]
-                return _sanitize_label(label)
+            with httpx.Client(timeout=60.0) as client:
+                resp = client.post(url, headers=headers, json={"inputs": text})
+            if resp.status_code == 200:
+                result = resp.json()
+                if isinstance(result, list):
+                    label = max(result[0], key=lambda x: x["score"])["label"]
+                    return _sanitize_label(label)
+            if attempt < len(backoff_schedule) - 1:
+                time.sleep(wait)
         except Exception:
-            pass
-        time.sleep(2)
-    raise RuntimeError("HuggingFace model unavailable after 3 retries")
+            if attempt < len(backoff_schedule) - 1:
+                time.sleep(wait)
+            continue
+
+    # all retries exhausted — keyword fallback
+    return _keyword_fallback(text)
+
+
+def _keyword_fallback(text: str) -> str:
+    text = text.lower()
+    if any(w in text for w in ["happy", "joy", "excited", "love", "great", "wonderful"]):
+        return _sanitize_label("joy")
+    if any(w in text for w in ["sad", "depressed", "cry", "grief", "lonely", "heartbreak"]):
+        return _sanitize_label("sadness")
+    if any(w in text for w in ["angry", "rage", "furious", "hate", "annoyed"]):
+        return _sanitize_label("anger")
+    if any(w in text for w in ["fear", "scared", "anxious", "nervous", "worry", "dread"]):
+        return _sanitize_label("fear")
+    if any(w in text for w in ["bold", "power", "strong", "confident", "energy"]):
+        return _sanitize_label("anger")
+    return _sanitize_label("neutral")
 
 
 #  DESIGN EXTRACTION
@@ -61,7 +97,7 @@ def extract_design(emotion: str):
     return palette, fonts.get("title", "Playfair Display"), fonts.get("body", "Lato")
 
 
-#  FONT DOWNLOAD 
+#  FONT DOWNLOAD
 _FONT_URL_OVERRIDES = {
     "Poppins":    "https://fonts.gstatic.com/s/poppins/v20/pxiGyp8kv8JHgFVrJJfedw.woff2",
     "Open Sans":  "https://fonts.gstatic.com/s/opensans/v18/mem8YaGs126MiZpBA-UFVZ0bf8pkAg.woff2",
@@ -100,7 +136,6 @@ def _download_font(name: str, url: str) -> str:
     return path
 
 def load_fonts(emotion: str) -> dict:
-    """Returns {role: ttf_path} for headings / body_text / highlight_text."""
     data      = emotion_dataset[emotion]
     font_meta = data.get("fonts", {})
     paths     = {}
@@ -196,7 +231,7 @@ def render_typography(canvas: Image.Image, emotion: str) -> Image.Image:
     return canvas
 
 
-#  IMAGE SEARCH & FETCH 
+#  IMAGE SEARCH & FETCH
 def build_image_queries(prompt: str, emotion: str) -> list[str]:
     palette, title_font, body_font = extract_design(emotion)
     context = f"""
@@ -233,7 +268,6 @@ Return ONLY valid JSON with key "queries" containing an array of 6 strings.
     return json.loads(resp.choices[0].message.content)["queries"]
 
 def _fetch_one(query: str) -> Image.Image | None:
-    """Search Pexels for one query and return a PIL Image (or None on failure)."""
     try:
         r    = requests.get(
             "https://api.pexels.com/v1/search",
@@ -244,14 +278,13 @@ def _fetch_one(query: str) -> Image.Image | None:
         data = r.json()
         if not data.get("photos"):
             return None
-        url  = data["photos"][0]["src"]["large"]
+        url      = data["photos"][0]["src"]["large"]
         img_data = requests.get(url, timeout=15).content
         return Image.open(BytesIO(img_data))
     except Exception:
         return None
 
 def fetch_images_parallel(queries: list[str]) -> list[Image.Image]:
-    """Fetch up to 6 images in parallel using a thread pool."""
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:
         results = list(ex.map(_fetch_one, queries[:6]))
     return [img for img in results if img is not None]
@@ -286,17 +319,14 @@ def create_moodboard(prompt: str, emotion: str) -> Image.Image:
 #  VERCEL HTTP HANDLER
 class handler(BaseHTTPRequestHandler):
 
-    # ── silence the default access-log noise in Vercel logs ──
     def log_message(self, fmt, *args):
         pass
 
-    # ── CORS pre-flight ──
     def do_OPTIONS(self):
         self.send_response(200)
         self._cors_headers()
         self.end_headers()
 
-    # ── main endpoint ──
     def do_POST(self):
         try:
             length = int(self.headers.get("Content-Length", 0))
@@ -318,7 +348,6 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             self._json(500, {"error": str(e)})
 
-    # ── helpers ──
     def _cors_headers(self):
         self.send_header("Access-Control-Allow-Origin",  "*")
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
