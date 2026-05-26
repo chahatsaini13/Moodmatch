@@ -71,11 +71,13 @@ def predict_emotion(text: str) -> str:
         "x-wait-for-model": "true",
         "Content-Type":     "application/json",
     }
+
     try:
         with httpx.Client(timeout=60.0) as client:
             client.post(url, headers=headers, json={"inputs": "warmup"})
     except Exception:
         pass
+
     backoff_schedule = [5, 15, 30, 45]
 
     for attempt, wait in enumerate(backoff_schedule):
@@ -85,15 +87,26 @@ def predict_emotion(text: str) -> str:
             if resp.status_code == 200:
                 result = resp.json()
                 if isinstance(result, list):
-                    label = max(result[0], key=lambda x: x["score"])["label"]
-                    sanitized = _sanitize_label(label)
-                    return EMOTION_MAP.get(sanitized, sanitized)
+                    top = max(result[0], key=lambda x: x["score"])
+                    label     = _sanitize_label(top["label"])
+                    hf_emotion = EMOTION_MAP.get(label, label)
+                    confidence = top["score"]
+
+                    # HF is confident — trust it directly
+                    if confidence >= 0.60:
+                        return hf_emotion
+
+                    # HF is unsure — let Groq decide
+                    return _groq_fallback(text)
+
             if attempt < len(backoff_schedule) - 1:
                 time.sleep(wait)
         except Exception:
             if attempt < len(backoff_schedule) - 1:
                 time.sleep(wait)
             continue
+
+    # HF completely down — Groq takes over
     return _groq_fallback(text)
 
 
