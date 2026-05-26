@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Warm up HuggingFace model in the background
+  fetch('/api/warmup').catch(() => {});
+  
   // === CREATOR BLOCK ANIMATION ON SCROLL ===
   const container = document.querySelector('.creators-container');
   if (container) {
