@@ -32,7 +32,35 @@ with open(DATA_PATH) as _f:
 
 emotion_dataset: dict = {_sanitize_label(k): v for k, v in _raw.items()}
 template_bg: Image.Image = Image.open(TEMPLATE_PATH).convert("RGB")
-
+EMOTION_MAP = {
+    "JOY":       "JOY/HAPPINESS",
+    "HAPPINESS": "JOY/HAPPINESS",
+    "HAPPY":     "JOY/HAPPINESS",
+    "FEAR":      "FEAR/ANXIETY",
+    "ANXIETY":   "FEAR/ANXIETY",
+    "DISGUST":   "DISGUST/NAUSEA",
+    "NAUSEA":    "DISGUST/NAUSEA",
+    "GUILT":     "GUILT/SHAME",
+    "SHAME":     "GUILT/SHAME",
+    "HOPE":      "HOPE/GLOW",
+    "GLOW":      "HOPE/GLOW",
+    "LOVE":      "LOVE/BLUSH",
+    "BLUSH":     "LOVE/BLUSH",
+    "NEUTRAL":   "NEUTRAL/CLARITY",
+    "CLARITY":   "NEUTRAL/CLARITY",
+    "PEACE":     "PEACE/SERENITY",
+    "SERENITY":  "PEACE/SERENITY",
+    "POWER":     "POWER/ANGER",
+    "ANGER":     "POWER/ANGER",
+    "ANGRY":     "POWER/ANGER",
+    "SORROW":    "SORROW/DUSK",
+    "SADNESS":   "SORROW/DUSK",
+    "SAD":       "SORROW/DUSK",
+    "SURPRISE":  "SURPRISE/WONDER",
+    "WONDER":    "SURPRISE/WONDER",
+    "TRUST":     "TRUST/SECURITY",
+    "SECURITY":  "TRUST/SECURITY",
+}
 
 #  EMOTION CLASSIFICATION
 def predict_emotion(text: str) -> str:
@@ -61,31 +89,42 @@ def predict_emotion(text: str) -> str:
                 result = resp.json()
                 if isinstance(result, list):
                     label = max(result[0], key=lambda x: x["score"])["label"]
-                    return _sanitize_label(label)
+                    sanitized = _sanitize_label(label)
+                    return EMOTION_MAP.get(sanitized, sanitized)
             if attempt < len(backoff_schedule) - 1:
                 time.sleep(wait)
         except Exception:
             if attempt < len(backoff_schedule) - 1:
                 time.sleep(wait)
             continue
-
-    # all retries exhausted — keyword fallback
     return _keyword_fallback(text)
 
 
 def _keyword_fallback(text: str) -> str:
     text = text.lower()
-    if any(w in text for w in ["happy", "joy", "excited", "love", "great", "wonderful"]):
-        return _sanitize_label("joy")
-    if any(w in text for w in ["sad", "depressed", "cry", "grief", "lonely", "heartbreak"]):
-        return _sanitize_label("sadness")
-    if any(w in text for w in ["angry", "rage", "furious", "hate", "annoyed"]):
-        return _sanitize_label("anger")
+    if any(w in text for w in ["happy", "joy", "excited", "fun", "vibrant", "playful", "cheerful"]):
+        return "JOY/HAPPINESS"
+    if any(w in text for w in ["love", "romantic", "affection", "blush", "tender"]):
+        return "LOVE/BLUSH"
+    if any(w in text for w in ["sad", "depressed", "cry", "grief", "lonely", "heartbreak", "sorrow"]):
+        return "SORROW/DUSK"
+    if any(w in text for w in ["angry", "rage", "furious", "hate", "annoyed", "power", "bold", "strong"]):
+        return "POWER/ANGER"
     if any(w in text for w in ["fear", "scared", "anxious", "nervous", "worry", "dread"]):
-        return _sanitize_label("fear")
-    if any(w in text for w in ["bold", "power", "strong", "confident", "energy"]):
-        return _sanitize_label("anger")
-    return _sanitize_label("neutral")
+        return "FEAR/ANXIETY"
+    if any(w in text for w in ["peace", "calm", "serene", "relax", "gentle", "soft"]):
+        return "PEACE/SERENITY"
+    if any(w in text for w in ["trust", "safe", "secure", "stable", "comfort"]):
+        return "TRUST/SECURITY"
+    if any(w in text for w in ["hope", "glow", "warm", "optimistic", "bright"]):
+        return "HOPE/GLOW"
+    if any(w in text for w in ["surprise", "wonder", "amazed", "curious", "wow"]):
+        return "SURPRISE/WONDER"
+    if any(w in text for w in ["guilt", "shame", "regret", "embarrassed"]):
+        return "GUILT/SHAME"
+    if any(w in text for w in ["disgust", "nausea", "gross", "repulsed"]):
+        return "DISGUST/NAUSEA"
+    return "NEUTRAL/CLARITY"
 
 
 #  DESIGN EXTRACTION
