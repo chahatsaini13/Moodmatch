@@ -1,13 +1,17 @@
 {
   "version": 2,
-  "functions": {
-    "api/generate.py": {
-      "maxDuration": 120
+  "builds": [
+    {
+      "src": "api/generate.py",
+      "use": "@vercel/python",
+      "config": { "maxDuration": 120 }
     },
-    "api/warmup.py": {
-      "maxDuration": 15
+    {
+      "src": "api/warmup.py",
+      "use": "@vercel/python",
+      "config": { "maxDuration": 15 }
     }
-  },
+  ],
   "routes": [
     { "src": "/api/generate", "dest": "/api/generate.py" },
     { "src": "/api/warmup", "dest": "/api/warmup.py" },
