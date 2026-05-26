@@ -13,7 +13,7 @@ def handler(request):
                 json={"inputs": "warmup"},
             )
     except Exception:
-        pass  # fire and forget, we don't care about the response
+        pass
 
     return {
         "statusCode": 200,
