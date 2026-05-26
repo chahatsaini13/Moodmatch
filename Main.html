@@ -42,6 +42,8 @@
     </div>
   </div>
    <script>
+    fetch('/api/warmup').catch(() => {});
+
     async function handleGenerate() {
       const input     = document.getElementById('prompt-input');
       const statusMsg = document.getElementById('status-msg');
