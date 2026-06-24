@@ -282,24 +282,27 @@ def render_typography(canvas: Image.Image, emotion: str) -> Image.Image:
 def build_image_queries(prompt: str, emotion: str) -> list[str]:
     palette, title_font, body_font = extract_design(emotion)
     context = f"""
-You are a visual search expert. Generate 6 Pexels photography search queries for a moodboard.
-
-User's idea: {prompt}
-Emotional tone: {emotion}
-Color palette to match: {palette}
-
-RULES:
-- Each query must visually reflect the emotional tone: {emotion}
-- Each query must incorporate the colors from the palette: {palette} — through lighting, objects, clothing, backgrounds, or atmosphere
-- The brightness, energy, and mood of every query must match the emotion — bright and airy for positive emotions, dark and muted for negative ones
-- Use concrete, visual, real-world subjects: people, nature, objects, spaces, textures
-- Add photography style words: natural light, cinematic, soft focus, golden hour, high contrast, shallow depth of field
-- Keep each query between 5 and 10 words
-- Do NOT use abstract or conceptual words like "emotion", "feeling", "mood", "concept"
-- Do NOT repeat the same subject across queries — vary the scenes
-
-Return ONLY valid JSON with key "queries" containing exactly 6 strings.
-"""
+    You are a visual search expert. Generate 6 Pexels photography search queries for a moodboard.
+    
+    User's idea: {prompt}
+    Emotional tone: {emotion}
+    Color palette to match: {palette}
+    
+    RULES:
+    - First, extract the concrete subject, industry, or domain from the user's idea — the literal thing it's about, not the feeling behind it.
+    - At least 4 of the 6 queries MUST contain a literal, visual object, person, or scene that belongs to that domain. If someone outside the project couldn't tell what industry or topic the moodboard is for just by looking at the images, the queries have failed.
+    - The emotional tone ({emotion}) should shape HOW that domain subject is shot — lighting, energy, atmosphere — not REPLACE it with an unrelated abstract scene.
+    - The remaining 1-2 queries may be more atmospheric or supporting shots, but should still relate to the domain where possible.
+    - Each query must incorporate the colors from the palette: {palette} — through lighting, objects, clothing, backgrounds, or atmosphere
+    - The brightness, energy, and mood of every query must match the emotion — bright and airy for positive emotions, dark and muted for negative ones
+    - Use concrete, visual, real-world subjects: people, nature, objects, spaces, textures
+    - Add photography style words: natural light, cinematic, soft focus, golden hour, high contrast, shallow depth of field
+    - Keep each query between 5 and 10 words
+    - Do NOT use abstract or conceptual words like "emotion", "feeling", "mood", "concept"
+    - Do NOT repeat the same subject across queries — vary the scenes
+    
+    Return ONLY valid JSON with key "queries" containing exactly 6 strings.
+    """
     resp = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         response_format={"type": "json_object"},
