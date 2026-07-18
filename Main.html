@@ -48,34 +48,92 @@
   </div>
    <script>
     fetch('/api/warmup').catch(() => {});
-
     async function handleGenerate() {
-      const input     = document.getElementById('prompt-input');
-      const statusMsg = document.getElementById('status-msg');
-      const spinner   = document.getElementById('spinner');
-      const btn       = document.getElementById('generate-btn');
-      const resultSec = document.getElementById('result-section');
-      const img       = document.getElementById('moodboard-img');
-      const dlBtn     = document.getElementById('download-btn');
-      const prompt    = input.value.trim();
-      if (!prompt) { statusMsg.className=''; statusMsg.textContent='Please enter a mood or idea first.'; return; }
-      statusMsg.className='info'; statusMsg.textContent='Generating your moodboard… this takes ~30–60 sec';
-      spinner.classList.add('active'); btn.disabled=true; resultSec.classList.remove('visible');
-      try {
-        const res  = await fetch('/api/generate', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt}) });
-        const data = await res.json();
-        if (!res.ok || data.error) throw new Error(data.error || 'Server error');
-        const src = `data:image/png;base64,${data.image_b64}`;
-        img.src=src; dlBtn.href=src;
-        resultSec.classList.add('visible');
-        statusMsg.className='info'; statusMsg.textContent='✓ Moodboard ready!';
-      } catch(err) {
-        statusMsg.className=''; statusMsg.textContent=`Error: ${err.message}`;
-      } finally {
-        spinner.classList.remove('active'); btn.disabled=false;
-      }
+        const input = document.getElementById('prompt-input');
+        const statusMsg = document.getElementById('status-msg');
+        const btn = document.getElementById('generate-btn');
+        const loader = document.getElementById('loader');
+        const loadingText = document.getElementById('loading-text');
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        const resultSec = document.getElementById('result-section');
+        const img = document.getElementById('moodboard-img');
+        const dlBtn = document.getElementById('download-btn');
+        const prompt = input.value.trim();
+        if (!prompt) {
+            statusMsg.className = "";
+            statusMsg.textContent = "Please enter a mood or idea first.";
+            return;
+        }
+        // Reset UI
+        resultSec.classList.remove('visible');
+        statusMsg.textContent = "";
+        btn.disabled = true;
+        loader.classList.add("active");
+        let progress = 0;
+        const interval = setInterval(() => {
+            if (progress < 92) {
+                progress++;
+                progressFill.style.width = progress + "%";
+                progressPercent.textContent = progress + "%";
+                if (progress < 20) {
+                    loadingText.textContent =
+                        "✨ Understanding your emotion...";
+                } else if (progress < 45) {
+                    loadingText.textContent =
+                        "🎨 Choosing colors & typography...";
+                } else if (progress < 75) {
+                    loadingText.textContent =
+                        "🖼️ Finding matching images...";
+    
+                } else {
+                    loadingText.textContent =
+                        "📋 Creating your moodboard...";
+                }
+            }
+        }, 500);
+        try {
+            const res = await fetch('/api/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    prompt
+                })
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+                throw new Error(data.error || "Server Error");
+            }
+            clearInterval(interval);
+            progressFill.style.width = "100%";
+            progressPercent.textContent = "100%";
+            loadingText.textContent = "✅ Moodboard ready!";
+            const src = `data:image/png;base64,${data.image_b64}`;
+            img.src = src;
+            dlBtn.href = src;
+            resultSec.classList.add("visible");
+        }
+        catch (err) {
+            clearInterval(interval);
+            statusMsg.textContent = "Error: " + err.message;
+    
+        }
+        finally {
+            setTimeout(() => {
+                loader.classList.remove("active");
+                progressFill.style.width = "0%";
+                progressPercent.textContent = "0%";
+                btn.disabled = false;
+            }, 800);
+        }
     }
-    document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey)&&e.key==='Enter') handleGenerate(); });
-  </script>
+    document.addEventListener("keydown", e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            handleGenerate();
+        }
+    });
+</script>
 </body>
 </html>
