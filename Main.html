@@ -23,8 +23,16 @@
         </p>
         <textarea id="prompt-input" class="input-box" placeholder="Enter your feelings or ideas here......"></textarea>
         <button class="generate-btn" id="generate-btn" onclick="handleGenerate()">Generate</button>
+        <div id="loader" class="loader">
+          <p id="loading-text">
+              ✨ Understanding your emotion...
+          </p>
+          <div class="progress-track">
+              <div id="progress-fill"></div>
+          </div>
+          <p id="progress-percent">0%</p>
+        </div>
         <p id="status-msg"></p>
-        <div class="spinner" id="spinner"></div>
       </div>
       <div id="result-section">
         <div id="emotion-text" class="emotion-text"></div>
